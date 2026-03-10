@@ -15,11 +15,24 @@ export default function Login() {
     if (isSignUp) {
       const { error } = await supabase.auth.signUp({ email, password });
       if (error) setMessage(error.message);
-      else window.location.href = "/quiz";
+      else window.location.href = "/welcome";
     } else {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) setMessage(error.message);
-      else window.location.href = "/dashboard";
+      if (error) {
+        setMessage(error.message);
+      } else {
+        const { data: { user } } = await supabase.auth.getUser();
+        const { data } = await supabase
+          .from("profiles")
+          .select("quiz_completed")
+          .eq("id", user.id)
+          .single();
+        if (data?.quiz_completed) {
+          window.location.href = "/dashboard";
+        } else {
+          window.location.href = "/welcome";
+        }
+      }
     }
     setLoading(false);
   };
@@ -27,7 +40,7 @@ export default function Login() {
   const handleGoogle = async () => {
     await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: "http://localhost:3000/quiz" }
+      options: { redirectTo: `${window.location.origin}/welcome` }
     });
   };
 
@@ -56,7 +69,6 @@ export default function Login() {
           {isSignUp ? "Create your account" : "Welcome back"}
         </p>
 
-        {/* GOOGLE BUTTON */}
         <button
           onClick={handleGoogle}
           style={{
