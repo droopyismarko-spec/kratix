@@ -15,7 +15,7 @@ export default function Login() {
     if (isSignUp) {
       const { error } = await supabase.auth.signUp({ email, password });
       if (error) setMessage(error.message);
-      else window.location.href = "/welcome";
+      else window.location.href = "/username";
     } else {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
@@ -30,7 +30,7 @@ export default function Login() {
         if (data?.quiz_completed) {
           window.location.href = "/dashboard";
         } else {
-          window.location.href = "/welcome";
+          window.location.href = "/username";
         }
       }
     }
@@ -40,7 +40,7 @@ export default function Login() {
   const handleGoogle = async () => {
     await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: `${window.location.origin}/welcome` }
+      options: { redirectTo: `${window.location.origin}/username` }
     });
   };
 
